@@ -3,39 +3,21 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BasicDDDSample.Repository.Migrations
 {
-    public partial class SecondChanges : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Nome",
-                table: "Customer");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Name",
-                table: "Customer",
-                nullable: true);
-
             migrationBuilder.CreateTable(
-                name: "Order",
+                name: "Customer",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Created = table.Column<DateTime>(nullable: false),
-                    CustomerId = table.Column<Guid>(nullable: true),
-                    IsPaid = table.Column<bool>(nullable: false),
-                    Number = table.Column<string>(nullable: true),
-                    TotalPrice = table.Column<decimal>(nullable: false)
+                    Email = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Order", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Order_Customer_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customer",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                    table.PrimaryKey("PK_Customer", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -49,6 +31,27 @@ namespace BasicDDDSample.Repository.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Product", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Order",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Created = table.Column<DateTime>(nullable: false),
+                    CustomerId = table.Column<Guid>(nullable: true),
+                    IsPaid = table.Column<bool>(nullable: false),
+                    Number = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Order", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Order_Customer_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,15 +107,8 @@ namespace BasicDDDSample.Repository.Migrations
             migrationBuilder.DropTable(
                 name: "Product");
 
-            migrationBuilder.DropColumn(
-                name: "Name",
-                table: "Customer");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Nome",
-                table: "Customer",
-                type: "nvarchar(max)",
-                nullable: true);
+            migrationBuilder.DropTable(
+                name: "Customer");
         }
     }
 }

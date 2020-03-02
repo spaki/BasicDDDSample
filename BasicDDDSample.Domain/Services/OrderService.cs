@@ -25,26 +25,48 @@ namespace BasicDDDSample.Domain.Services
 
         public List<OrderDto> List() => orderRepository.Query().OrderByDescending(e => e.Created).ToList().Select(e => new OrderDto(e)).ToList();
 
-        public List<OrderDto> List(Guid customerId) => orderRepository.Query(e => e.Customer.Id == customerId).OrderByDescending(e => e.Created).Select(e => new OrderDto(e)).ToList();
+        public List<OrderDto> List(Guid customerId) => orderRepository.Query(e => e.Customer.Id == customerId).OrderByDescending(e => e.Created).ToList().Select(e => new OrderDto(e)).ToList();
 
-        public OrderDto GetAsync(Guid id) => orderRepository.Query(e => e.Id == id).Select(e => new OrderDto(e)).FirstOrDefault();
+        //public OrderDto GetAsync(ulong number) => orderRepository.Query(e => e.Number == number).ToList().Select(e => new OrderDto(e)).FirstOrDefault();
+        public OrderDto GetAsync(ulong number)
+        {
+            var result = orderRepository.Query(e => e.Number == number).ToList().Select(e => new OrderDto(e)).FirstOrDefault();
+            return result;
+        }
 
 
         public async Task<Order> SaveAsync(Order entity) 
         {
-            if(entity.IsNew())
-                entity.Created = DateTime.UtcNow;
-            
-            entity.Customer = await customerRepository.GetAsync(entity.Customer.Id);
+            var original = await orderRepository.GetAsync(entity.Id);
 
-            for (int i = 0; i < entity.Items.Count; i++)
+            if (original == null)
+                original = Order.GenerateNew();
+
+            original.Customer = await customerRepository.GetAsync(entity.Customer.Id);
+            await SyncProducts(original, entity);
+
+            await orderRepository.SaveAsync(original);
+            return original;
+        }
+
+        private async Task SyncProducts(Order original, Order proposal)
+        {
+            foreach (var proposalItem in proposal.Items)
             {
-                var item = entity.Items[i];
-                item.Product = await productRepository.GetAsync(item.Product.Id);
-            }
+                var originalItemFound = original.Items.FirstOrDefault(originalItem => originalItem.Product.Id == proposalItem.Product.Id);
 
-            await orderRepository.SaveAsync(entity);
-            return entity;
+                if (originalItemFound != null) // -> update
+                {
+                    originalItemFound.Quantity = proposalItem.Quantity;
+                }
+                else // -> insert
+                {
+                    proposalItem.Product = await productRepository.GetAsync(proposalItem.Product.Id);
+                    original.Items.Add(proposalItem);
+                }
+            };
+
+            original.Items.RemoveAll(originalItem => !proposal.Items.Any(proposalItem => originalItem.Product.Id == proposalItem.Product.Id)); // -> delete
         }
     }
 }

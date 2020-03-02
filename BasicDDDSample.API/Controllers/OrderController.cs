@@ -21,17 +21,13 @@ namespace BasicDDDSample.API.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<OrderDto>> Get() => Ok(orderService.List());
 
-        [HttpGet("{id}")]
-        public ActionResult<OrderDto> GetById(Guid id) => Ok(orderService.GetAsync(id));
+        [HttpGet("{number}")]
+        public ActionResult<OrderDto> GetByNumber(ulong number) => Ok(orderService.GetAsync(number));
 
         [HttpGet("customer/{customerId}")]
         public ActionResult<IEnumerable<OrderDto>> GetByCustomer(Guid customerId) => Ok(orderService.List(customerId));
 
         [HttpPost]
-        public async Task<ActionResult> PostAsync(Order entity)
-        {
-            await orderService.SaveAsync(entity);
-            return Ok();
-        }
+        public async Task<ActionResult> PostAsync(Order entity) => Ok(await orderService.SaveAsync(entity));
     }
 }

@@ -51,6 +51,9 @@ namespace BasicDDDSample.Repository.Migrations
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
 
+                    b.Property<long>("Number")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");

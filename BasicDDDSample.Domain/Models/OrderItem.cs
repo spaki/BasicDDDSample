@@ -1,5 +1,4 @@
 ﻿using BasicDDDSample.Domain.Models.Common;
-using System;
 
 namespace BasicDDDSample.Domain.Models
 {

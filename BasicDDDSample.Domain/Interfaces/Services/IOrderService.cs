@@ -11,7 +11,7 @@ namespace BasicDDDSample.Domain.Interfaces.Services
     {
         List<OrderDto> List();
         List<OrderDto> List(Guid customerId);
-        OrderDto GetAsync(Guid id);
+        OrderDto GetAsync(ulong number);
         Task<Order> SaveAsync(Order entity);
     }
 }

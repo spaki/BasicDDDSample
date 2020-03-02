@@ -1,6 +1,7 @@
 ﻿using BasicDDDSample.Domain.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BasicDDDSample.Domain.Dtos
 {
@@ -8,21 +9,23 @@ namespace BasicDDDSample.Domain.Dtos
     {
         public OrderDto(Order entity)
         {
+            Id = entity.Id;
             Created = entity.Created;
-            Customer = entity.Customer;
+            Customer = new CustomerDto(entity.Customer);
             IsPaid = entity.IsPaid;
-            Items = entity.Items;
+            Number = entity.Number;
+            Items = entity.Items.Select(e => new OrderItemDto(e)).ToList();
             TotalPrice = entity.GetTotalPrice();
-            Number = entity.GetNumber();
         }
 
+        public Guid Id { get; set; }
         public DateTime Created { get; set; }
-        public Customer Customer { get; set; }
+        public CustomerDto Customer { get; set; }
         public bool IsPaid { get; set; }
 
-        public List<OrderItem> Items { get; set; } = new List<OrderItem>();
+        public List<OrderItemDto> Items { get; set; }
 
         public decimal TotalPrice { get; set; }
-        public string Number { get; set; }
+        public ulong Number { get; set; }
     }
 }

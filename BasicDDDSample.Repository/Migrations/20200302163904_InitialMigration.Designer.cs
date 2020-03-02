@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BasicDDDSample.Repository.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20200302031824_SecondChanges")]
-    partial class SecondChanges
+    [Migration("20200302163904_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -53,11 +53,8 @@ namespace BasicDDDSample.Repository.Migrations
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Number")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<long>("Number")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
